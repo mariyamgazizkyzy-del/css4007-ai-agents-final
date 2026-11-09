@@ -6,9 +6,9 @@ Set up the development environment (Node 22, `.env` from `.env.example`). Implem
 
 ## Important Commits
 
-- Commit hash: TODO-fill-after-commit
+- Commit hash: 0e39b79
 - Description: Add LLM client and first working request
-- Link: TODO-fill-after-commit
+- Link: https://github.com/mariyamgazizkyzy-del/css4007-ai-agents-final/commit/0e39b79
 
 ## Current Functionality
 
