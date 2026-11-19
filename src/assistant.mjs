@@ -28,7 +28,10 @@ async function run(question, { chatFn = chat, courses, today = new Date(), maxFo
       throw e;
     }
     const parsed = parseJsonStrict(reply.content);
-    const checked = parsed.ok ? validateIntent(parsed.value) : parsed;
+    let checked = parsed.ok ? validateIntent(parsed.value) : parsed;
+    if (checked.ok && checked.value.intent === "general" && /\b[A-Za-z]{2,4}\d{3}\b/.test(inp.value)) {
+      checked = { ok: false, reason: "the question mentions a course code, so use course_info, deadlines or exam_countdown, not general" };
+    }
     trace.push({ step: "llm_output", attempt, valid: checked.ok, reason: checked.ok ? undefined : checked.reason });
     if (checked.ok) { intent = checked.value; break; }
     messages = buildRepairMessages(inp.value, reply.content, checked.reason);
