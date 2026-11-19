@@ -8,7 +8,7 @@ import { buildIntentMessages, buildRepairMessages } from "./prompts.mjs";
  * -> data lookup -> answer built from real data. Week 13 replaces the fixed lookup
  * step with LLM-selected tool calls.
  */
-export async function handle(question, { chatFn = chat, courses, today = new Date(), maxFormatRetries = 1 } = {}) {
+async function run(question, { chatFn = chat, courses, today = new Date(), maxFormatRetries = 1 } = {}) {
   const trace = [];
   const inp = validateUserInput(question);
   if (!inp.ok) return { status: "invalid_input", answer: inp.reason, trace };
@@ -64,4 +64,21 @@ export async function handle(question, { chatFn = chat, courses, today = new Dat
   const n = daysUntil(info.exam_date, today);
   const when = n > 0 ? `${n} day(s) left` : n === 0 ? "the exam is today" : `the exam was ${-n} day(s) ago`;
   return { status: "ok", intent, trace, answer: `${info.course_id} exam is on ${info.exam_date}: ${when}.` };
+}
+
+/** Public entry point. Pass `logger` (e.g. appendLog) to record an execution trace. */
+export async function handle(question, opts = {}) {
+  const result = await run(question, opts);
+  if (opts.logger) {
+    try {
+      opts.logger({
+        ts: new Date().toISOString(),
+        goal: typeof question === "string" ? question : String(question),
+        status: result.status,
+        intent: result.intent,
+        trace: result.trace,
+      });
+    } catch { /* logging must never break the assistant */ }
+  }
+  return result;
 }
