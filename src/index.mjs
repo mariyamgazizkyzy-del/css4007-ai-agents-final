@@ -1,5 +1,4 @@
 import readline from "node:readline/promises";
-import { pathToFileURL } from "node:url";
 import { handle } from "./assistant.mjs";
 
 try { process.loadEnvFile(); } catch { /* .env optional if variables are exported */ }
@@ -9,7 +8,7 @@ export async function ask(question) {
   return r.answer;
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   const arg = process.argv.slice(2).join(" ");
   if (arg) console.log(await ask(arg));
   else {
